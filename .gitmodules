@@ -1,0 +1,6 @@
+[submodule "lib/mach-glfw"]
+	path = lib/mach-glfw
+	url = git@github.com:hexops/mach-glfw.git
+[submodule "lib/zgl"]
+	path = lib/zgl
+	url = git@github.com:ziglibs/zgl.git
