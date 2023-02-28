@@ -87,7 +87,7 @@ pub fn main() !void {
 
     var ebo = gl.Buffer.gen();
     defer ebo.delete();
-    ebo.bind(.array_buffer);
+    ebo.bind(.element_array_buffer);
     ebo.data(u8, &[_]u8{
         0, 1, 3,
         1, 2, 3,
@@ -106,7 +106,7 @@ pub fn main() !void {
     vao.enableVertexAttribute(2);
 
     var texture = gl.genTexture();
-    gl.bindTexture(texture, .@"2d");
+    texture.bind(.@"2d");
 
     // set wrapping parameters
     gl.texParameter(.@"2d", .wrap_s, .mirrored_repeat);
