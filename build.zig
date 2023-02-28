@@ -1,5 +1,6 @@
 const std = @import("std");
 const glfw = @import("lib/mach-glfw/build.zig");
+const zstbi = @import("lib/zig-gamedev/libs/zstbi/build.zig");
 
 pub fn build(b: *std.build.Builder) !void {
     // Standard target options allows the person running `zig build` to choose
@@ -27,6 +28,10 @@ pub fn build(b: *std.build.Builder) !void {
         .source_file = .{ .path = "lib/zgl/zgl.zig" },
     });
     exe.addModule("zgl", zgl);
+
+    const zstbi_pkg = zstbi.Package.build(b, target, optimize, .{});
+    exe.addModule("zstbi", zstbi_pkg.zstbi);
+    zstbi_pkg.link(exe);
 
     exe.install();
 
