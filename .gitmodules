@@ -4,3 +4,6 @@
 [submodule "lib/zgl"]
 	path = lib/zgl
 	url = git@github.com:ziglibs/zgl.git
+[submodule "lib/zig-gamedev"]
+	path = lib/zig-gamedev
+	url = git@github.com:michal-z/zig-gamedev.git
