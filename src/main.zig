@@ -20,6 +20,7 @@ pub fn main() !void {
 
     zstbi.init(allocator);
     defer zstbi.deinit();
+    zstbi.setFlipVerticallyOnLoad(true);
 
     // FIXME: do not handle nullables like this
     const window = glfw.Window.create(640, 480, "OpenGL basics", null, null, .{
@@ -66,8 +67,6 @@ pub fn main() !void {
     vertexShader.delete();
     fragShader.delete();
 
-    std.debug.print("{}\n", .{gl.getInteger(.max_vertex_attribs)});
-
     // Vertex Array Object
     var vao = gl.VertexArray.gen();
     defer vao.delete();
@@ -106,6 +105,7 @@ pub fn main() !void {
     vao.enableVertexAttribute(2);
 
     var texture = gl.genTexture();
+    gl.activeTexture(.texture_0);
     texture.bind(.@"2d");
 
     // set wrapping parameters
@@ -116,9 +116,29 @@ pub fn main() !void {
     gl.texParameter(.@"2d", .mag_filter, .linear);
 
     var image = try zstbi.Image.loadFromFile("asset/wall.jpg", 3);
-    defer image.deinit();
     gl.textureImage2D(.@"2d", 0, .rgb, image.width, image.height, .rgb, .unsigned_byte, @ptrCast([*]const u8, image.data));
     gl.generateMipmap(.@"2d");
+    image.deinit();
+
+    var texture2 = gl.genTexture();
+    gl.activeTexture(.texture_1);
+    texture2.bind(.@"2d");
+
+    // set wrapping parameters
+    gl.texParameter(.@"2d", .wrap_s, .mirrored_repeat);
+    gl.texParameter(.@"2d", .wrap_t, .mirrored_repeat);
+    // set filtering parameters
+    gl.texParameter(.@"2d", .min_filter, .linear_mipmap_linear);
+    gl.texParameter(.@"2d", .mag_filter, .linear);
+
+    var image2 = try zstbi.Image.loadFromFile("asset/awesomeface.png", 0);
+    defer image2.deinit();
+    gl.textureImage2D(.@"2d", 0, .rgba, image2.width, image2.height, .rgba, .unsigned_byte, @ptrCast([*]const u8, image2.data));
+    gl.generateMipmap(.@"2d");
+
+    shaderProgram.use();
+    gl.uniform1i(gl.getUniformLocation(shaderProgram, "texture1"), 0);
+    gl.uniform1i(gl.getUniformLocation(shaderProgram, "texture2"), 1);
 
     while (!window.shouldClose()) {
         // render here
@@ -129,11 +149,13 @@ pub fn main() !void {
             .stencil = true,
         });
 
+        gl.activeTexture(.texture_0);
         texture.bind(.@"2d");
+        gl.activeTexture(.texture_1);
+        texture2.bind(.@"2d");
 
         shaderProgram.use();
         vao.bind();
-
         gl.drawElements(.triangles, 6, .u8, 0);
 
         // swap front end back buffers
